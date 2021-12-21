@@ -29,6 +29,7 @@ Specific service variables:
 - `service_grafana_admin_password`: string
 - `service_grafana_client_id`: string (used for the IAM login)
 - `service_grafana_client_secret`: string (used for the IAM login)
+- `service_grafana_image`: string (default: `"dodasts/monitoring-grafana:v1.0.1-monitoring"`)
 
 ### vars
 
