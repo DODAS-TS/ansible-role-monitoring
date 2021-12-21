@@ -4,5 +4,4 @@ nvidia_monitoring: ""
 nvidia_depends: ""
 prometheus_nvidia: ""
 grafana_service: ""
-grafana_image: "dodasts/monitoring-grafana:v1.0.1-monitoring"
 service_grafana_disable_admin_creation: true
