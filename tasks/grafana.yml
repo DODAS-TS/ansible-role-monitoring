@@ -17,37 +17,41 @@
     dest: /usr/local/share/dodasts/monitoring
     directory_mode: 0755
 
-- name: Add execution permission to get_client
-  file:
-    path: /usr/local/share/dodasts/monitoring/grafana/utils/get_client
-    mode: u+rwx
+- block:
+  - name: Register iam client
+    uri:
+      url: "{{ monitoring_iam_url }}/register" 
+      validate_certs: "no"
+      method: POST
+      status_code: 201
+      headers:
+         Content-Type: "application/json"
+      body:
+        redirect_uris:
+          - "https://{{ monitoring_server_ip }}:{{ service_grafana_port }}/login/generic_oauth"
+        client_name: "oc-client"
+        token_endpoint_auth_method: client_secret_basic
+        scope: openid email profile
+        grant_types:
+          - authorization_code
+        response_types:
+          - code
+      body_format: json
+      return_content: yes
+    register: iam_response
 
-- name: download dodas-IAMClientRec
-  git:
-    repo: "https://github.com/DODAS-TS/dodas-IAMClientRec.git"
-    dest: /usr/local/share/dodasts/dodas-IAMClientRec
-    force: yes
+  - name: Save client info
+    copy:
+      content: "{{iam_response.json}}"
+      dest: "/usr/local/share/dodasts/monitoring/.client-iam.json"
 
-- name: compile dodas-IAMClientRec
-  shell:
-    cmd: go build
-    chdir: /usr/local/share/dodasts/dodas-IAMClientRec
-
-- name: link executable dodas-IAMClientRec
-  shell:
-    cmd: ln -s /usr/local/share/dodasts/dodas-IAMClientRec/dodas-IAMClientRec /usr/local/bin/dodas-IAMClientRec
-    creates: /usr/local/bin/dodas-IAMClientRec
-
-- name: Create grafana config
-  template:
-    src: grafana.ini.j2
-    dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
-
-- name: get client id and secret
-  shell:
-    cmd: |
-      /usr/local/share/dodasts/monitoring/grafana/utils/get_client {{ monitoring_iam_url }} {{ monitoring_server_ip }} {{ service_grafana_port }}
-  when: service_grafana_client_id == "CLIENT_ID" and service_grafana_client_secret == "CLIENT_SECRET"
+  - name: Create grafana config
+    template:
+      src: grafana.ini.j2
+      dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
+    vars:
+      client_id: "{{iam_response.json.client_id}}"
+      client_secret: "{{ iam_response.json.client_secret }}"
 
 - name: let grafana to create admin
   set_fact:

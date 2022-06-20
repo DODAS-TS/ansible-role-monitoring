@@ -1,18 +1,20 @@
 [auth.generic_oauth]
+login_attribute_path=preferred_username
 enabled = true
 allow_sign_up = true
 team_ids =
 allowed_organizations =
 name = IAM
-client_id = {{ service_grafana_client_id }}
-client_secret = {{ service_grafana_client_secret }}
+client_id = "{{ client_id }}"
+
+client_secret = "{{ client_secret }}"
+
 scopes = openid profile email
 auth_url = {{ monitoring_iam_url }}/authorize
 token_url = {{ monitoring_iam_url }}/token
 api_url = {{ monitoring_iam_url }}/userinfo
 
-# ToDO: fix permissions
-# role_attribute_path = contains(info.groups[*], 'admin') && 'Admin' || contains(info.groups[*], 'editor') && 'Editor' || 'Viewer'
+role_attribute_path = sub=='{{ monitoring_iam_sub }}' && 'Admin' || contains(groups[*], '{{ monitoring_iam_admin_groups }}') && 'Editor' || 'Viewer'
 [security]
 cookie_secure=true
 
