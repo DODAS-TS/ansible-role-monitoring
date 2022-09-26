@@ -20,7 +20,7 @@
 - block:
   - name: Register iam client
     uri:
-      url: "{{ monitoring_iam_url }}/register" 
+      url: "{{ monitoring_iam_url }}/register"
       validate_certs: "no"
       method: POST
       status_code: 201
@@ -42,7 +42,7 @@
 
   - name: Save client info
     copy:
-      content: "{{iam_response.json}}"
+      content: "{{ iam_response.json }}"
       dest: "/usr/local/share/dodasts/monitoring/.client-iam.json"
 
   - name: Create grafana config
@@ -50,7 +50,7 @@
       src: grafana.ini.j2
       dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
     vars:
-      client_id: "{{iam_response.json.client_id}}"
+      client_id: "{{ iam_response.json.client_id }}"
       client_secret: "{{ iam_response.json.client_secret }}"
 
 - name: let grafana to create admin
