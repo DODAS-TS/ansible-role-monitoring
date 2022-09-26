@@ -76,6 +76,7 @@
             - {{ service_grafana_port }}:{{ service_grafana_port }}
           volumes:
             - /usr/local/share/dodasts/certs/grafana:/usr/local/share/dodasts/certs/grafana
+            - /usr/local/share/dodasts/monitoring/grafana/data:/var/lib/grafana
             - /usr/local/share/dodasts/monitoring/grafana/config:/opt/grafana/
             - /usr/local/share/dodasts/monitoring/grafana/config/provisioning:/etc/grafana/provisioning
             - /usr/local/share/dodasts/monitoring/grafana/dash_models:/opt/dash_models
@@ -84,3 +85,4 @@
             - GF_SECURITY_ADMIN_PASSWORD={{ service_grafana_admin_password }}
             - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION={{ service_grafana_disable_admin_creation }}
             - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_UNIFIED_ALERTING_ENABLED=true
