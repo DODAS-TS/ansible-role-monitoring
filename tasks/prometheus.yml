@@ -1,10 +1,10 @@
 ---
-- name: "prepare variables for monitoring"
-  set_fact:
+- name: Prepare variables for monitoring
+  ansible.builtin.set_fact:
     key_value: "yes"
     nvidia_monitoring: |
       nvidia:
-          runtime: nvidia
+          # runtime: nvidia
           image: nvidia/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04
           container_name: monitoring_nvidia
           privileged: true
@@ -13,30 +13,39 @@
             - 9400
           #ports:
           #  - 9400:9400
+          # Enabling GPU access with Compose:
+          # https://docs.docker.com/compose/gpu-support/
+          deploy:
+            resources:
+              reservations:
+                devices:
+                  - driver: nvidia
+                    count: all
+                    capabilities: [gpu]
     nvidia_depends: "- nvidia"
     prometheus_nvidia: "- 'monitoring_nvidia:9400'"
   when: (use_gpu | bool)
 
 - name: Create directory for monitoring
-  file:
+  ansible.builtin.file:
     path: /usr/local/share/dodasts/monitoring
     state: directory
     mode: 0755
 
 - name: Create directory for prometheus
-  file:
+  ansible.builtin.file:
     path: /usr/local/share/dodasts/monitoring/prometheus
     state: directory
     mode: 0755
 
 - name: Create directory for prometheus config
-  file:
+  ansible.builtin.file:
     path: /usr/local/share/dodasts/monitoring/prometheus/config
     state: directory
     mode: 0755
 
 - name: Create directory for prometheus data
-  file:
+  ansible.builtin.file:
     path: /usr/local/share/dodasts/monitoring/prometheus/data
     state: directory
     owner: nobody
@@ -44,6 +53,6 @@
     mode: 0755
 
 - name: Create prometheus config for monitoring from template
-  template:
+  ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /usr/local/share/dodasts/monitoring/prometheus/config/prometheus.yml
