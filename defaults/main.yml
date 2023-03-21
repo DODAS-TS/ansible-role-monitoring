@@ -15,5 +15,4 @@ service_grafana: yes
 service_grafana_port: 3000
 service_grafana_admin_user: ""
 service_grafana_admin_password: ""
-#service_grafana_image: "dodasts/monitoring-grafana:v1.0.8-monitoring"
-service_grafana_image: "mginfn/monitoring-grafana:v1.0.8-monitoring"
+service_grafana_image: "dodasts/monitoring-grafana:v1.0.8-monitoring"
