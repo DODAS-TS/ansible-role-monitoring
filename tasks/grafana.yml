@@ -1,21 +1,43 @@
 ---
-- name: Create directory for monitoring
-  file:
-    path: /usr/local/share/dodasts/monitoring
-    state: directory
-    mode: 0755
+- name: Ensure group "grafana" exists
+  ansible.builtin.group:
+    name: grafana
+    state: present
 
-- name: Create directory for grafana
+- name: Add the user 'grafana'
+  ansible.builtin.user:
+    name: grafana
+    group: grafana
+
+- name: Get grafana user info
+  ansible.builtin.getent:
+    database: passwd
+    key: grafana
+
+- name: Create directories for monitoring
   file:
-    path: /usr/local/share/dodasts/monitoring/grafana
+    path: "{{ item }}"
     state: directory
+    owner: grafana
+    group: grafana
     mode: 0755
+  loop:
+    - /usr/local/share/dodasts/monitoring
+    - /usr/local/share/dodasts/monitoring/grafana
+    - /usr/local/share/dodasts/monitoring/grafana/data
 
 - name: Create grafana configs
   copy:
     src: "{{ role_path }}/files/grafana"
     dest: /usr/local/share/dodasts/monitoring
     directory_mode: 0755
+
+
+- name: check if the oidc client file already exists
+  stat:
+    path: "/usr/local/share/dodasts/monitoring/.client-iam.json"
+  register: oidc_config
+
 
 - block:
   - name: Retrieve registration endpoint from OpenID configuration
@@ -24,9 +46,11 @@
       method: GET
       return_content: yes
     register: openid_config
+
   - name: Set registration endpoint variable
     set_fact:
       registration_endpoint: "{{ openid_config.json.registration_endpoint }}"
+
   - name: Register iam client
     uri:
       url: "{{ registration_endpoint }}"
@@ -53,14 +77,21 @@
     copy:
       content: "{{ iam_response.json }}"
       dest: "/usr/local/share/dodasts/monitoring/.client-iam.json"
+  when: not oidc_config.stat.exists|bool
 
-  - name: Create grafana config
-    template:
-      src: grafana.ini.j2
-      dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
-    vars:
-      client_id: "{{ iam_response.json.client_id }}"
-      client_secret: "{{ iam_response.json.client_secret }}"
+
+- name: Retrieve client info
+  set_fact:
+    iam_response: "{{ lookup('file', '/usr/local/share/dodasts/monitoring/.client-iam.json') }}"
+
+
+- name: Create grafana config
+  template:
+    src: grafana.ini.j2
+    dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
+  vars:
+    client_id: "{{ iam_response.client_id }}"
+    client_secret: "{{ iam_response.client_secret }}"
 
 - name: let grafana to create admin
   set_fact:
@@ -74,7 +105,8 @@
     grafana_service: |
       grafana:
           image: {{ service_grafana_image }}
-          container_name: monitoring_grafana
+          container_name: grafana
+          user: "{{ getent_passwd['grafana'][1] }}:{{ getent_passwd['grafana'][2] }}"
           depends_on:
             - prometheus
           restart: unless-stopped
