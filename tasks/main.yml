@@ -1,12 +1,12 @@
 ---
-- name: get docker-compose version
-  shell: docker-compose -v
+- name: Get docker compose version
+  shell: docker compose version
   register: docker_compose_version
 
-- name: check docker-compose
+- name: Check docker compose
   fail:
     msg: "Docker compose is required"
-  when: docker_compose_version.stdout.find("docker-compose version") == -1
+  when: docker_compose_version.stdout.find("Docker Compose version") == -1
 
 - name: Setup Monitoring [prometheus]
   include_tasks: prometheus.yml
@@ -18,9 +18,9 @@
 - name: Create monitoring compose
   template:
     src: monitoring-compose.yml.j2
-    dest: /usr/local/share/dodasts/monitoring/docker-compose.yml
+    dest: /usr/local/share/dodasts/monitoring/compose.yml
 
 - name: Run monitoring
   shell:
-    cmd: docker-compose up -d
+    cmd: docker compose up -d
     chdir: /usr/local/share/dodasts/monitoring
