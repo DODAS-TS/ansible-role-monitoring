@@ -6,7 +6,7 @@
 - name: Check docker compose
   fail:
     msg: "Docker compose is required"
-  when: docker_compose_version.stdout.find("docker compose version") == -1
+  when: docker_compose_version.stdout.find("Docker Compose version") == -1
 
 - name: Setup Monitoring [prometheus]
   include_tasks: prometheus.yml
