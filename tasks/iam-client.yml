@@ -9,7 +9,11 @@
 
 - name: Define the new redirect_uri variable
   ansible.builtin.set_fact:
-    iam_redirect_uri: "https://{{ monitoring_dns_name }}:{{ service_grafana_port }}/login/generic_oauth"
+    mon_iam_redirect_uri: "https://{{ monitoring_dns_name }}:{{ service_grafana_port }}/login/generic_oauth"
+
+- name: show mon_iam_redirect_uri
+  debug:
+    var: mon_iam_redirect_uri
 
 - name: Retrieve registration endpoint from OpenID configuration
   ansible.builtin.uri:
@@ -35,7 +39,11 @@
 
 - name: Modify client JSON
   ansible.builtin.set_fact:
-    modified_client_info: "{{ iam_client_get_response.json | combine({'redirect_uris': [iam_redirect_uri]}) }}"
+    modified_client_info: "{{ iam_client_get_response.json | combine({'redirect_uris': iam_client_get_response.json.redirect_uris + [mon_iam_redirect_uri]}) }}"
+
+- name: show iam_redirect_uri
+  debug:
+    var: modified_client_info
 
 - name: Update client
   ansible.builtin.uri:
