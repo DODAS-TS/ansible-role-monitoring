@@ -47,11 +47,9 @@
   ansible.builtin.include_tasks: iam-client.yml
 # ----------------------------------------------------------------------
 
-
 - name: Retrieve client info
   set_fact:
     iam_response: "{{ lookup('file', '/usr/local/share/dodasts/monitoring/.client-iam.json') }}"
-
 
 - name: Create grafana config
   template:
