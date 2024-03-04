@@ -56,11 +56,11 @@
 - name: Check vars before interacting with the IAM issuer
   ansible.builtin.assert:
     that:
-      - monitoring_iam_url        | length > 0
+      - monitoring_iam_url        | length > 0  
       - monitoring_iam_client_id  | length > 0
       - monitoring_iam_token      | length > 0
       - monitoring_dns_name       | length > 0
-      - service_grafana_port      | length > 0
+      - service_grafana_port      is defined
     fail_msg: Not defined variable among monitoring_iam_url, monitoring_iam_client_id, monitoring_iam_token, monitoring_dns_name and service_grafana_port.
 
 - name: Collect, Update and store locally the IAM Client info
