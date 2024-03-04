@@ -1,19 +1,7 @@
 ---
-#  client_name: "oc-client"
-#  token_endpoint_auth_method: client_secret_basic
-#  scope: openid email profile
-#  grant_types:
-#    - authorization_code
-#  response_types:
-#    - code
-
 - name: Define the new redirect_uri variable
   ansible.builtin.set_fact:
     mon_iam_redirect_uri: "https://{{ monitoring_dns_name }}:{{ service_grafana_port }}/login/generic_oauth"
-
-- name: show mon_iam_redirect_uri
-  debug:
-    var: mon_iam_redirect_uri
 
 - name: Retrieve registration endpoint from OpenID configuration
   ansible.builtin.uri:
@@ -40,10 +28,6 @@
 - name: Modify client JSON
   ansible.builtin.set_fact:
     modified_client_info: "{{ iam_client_get_response.json | combine({'redirect_uris': iam_client_get_response.json.redirect_uris + [mon_iam_redirect_uri]}) }}"
-
-- name: show iam_redirect_uri
-  debug:
-    var: modified_client_info
 
 - name: Update client
   ansible.builtin.uri:

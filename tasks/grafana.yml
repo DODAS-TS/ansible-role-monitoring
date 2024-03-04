@@ -32,26 +32,6 @@
     dest: /usr/local/share/dodasts/monitoring
     directory_mode: 0755
 
-- name: debug show monitoring_iam_url
-  debug:
-    var: monitoring_iam_url
-
-- name: debug show monitoring_iam_client_id
-  debug:
-    var: monitoring_iam_client_id
-
-- name: debug show monitoring_iam_token
-  debug:
-    var: monitoring_iam_token
-
-- name: debug show monitoring_dns_name
-  debug:
-    var: monitoring_dns_name
-
-- name: debug show service_grafana_port
-  debug:
-    var: service_grafana_port
-    
 # ---------- IAM Client retrieving, updating and local saving ----------
 - name: Check vars before interacting with the IAM issuer
   ansible.builtin.assert:
