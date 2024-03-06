@@ -36,7 +36,7 @@
 - name: Check vars before interacting with the IAM issuer
   ansible.builtin.assert:
     that:
-      - monitoring_iam_url        | length > 0  
+      - monitoring_iam_url        | length > 0
       - monitoring_iam_client_id  | length > 0
       - monitoring_iam_token      | length > 0
       - monitoring_dns_name       | length > 0
