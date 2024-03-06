@@ -32,58 +32,24 @@
     dest: /usr/local/share/dodasts/monitoring
     directory_mode: 0755
 
+# ---------- IAM Client retrieving, updating and local saving ----------
+- name: Check vars before interacting with the IAM issuer
+  ansible.builtin.assert:
+    that:
+      - monitoring_iam_url        | length > 0
+      - monitoring_iam_client_id  | length > 0
+      - monitoring_iam_token      | length > 0
+      - monitoring_dns_name       | length > 0
+      - service_grafana_port      is defined
+    fail_msg: Not defined variable among monitoring_iam_url, monitoring_iam_client_id, monitoring_iam_token, monitoring_dns_name and service_grafana_port.
 
-- name: check if the oidc client file already exists
-  stat:
-    path: "/usr/local/share/dodasts/monitoring/.client-iam.json"
-  register: oidc_config
-
-
-- block:
-  - name: Retrieve registration endpoint from OpenID configuration
-    uri:
-      url: "{{ monitoring_iam_url }}/.well-known/openid-configuration"
-      method: GET
-      return_content: yes
-    register: openid_config
-
-  - name: Set registration endpoint variable
-    set_fact:
-      registration_endpoint: "{{ openid_config.json.registration_endpoint }}"
-
-  - name: Register iam client
-    uri:
-      url: "{{ registration_endpoint }}"
-      validate_certs: "no"
-      method: POST
-      status_code: 201
-      headers:
-         Content-Type: "application/json"
-      body:
-        redirect_uris:
-          - "https://{{ monitoring_dns_name }}:{{ service_grafana_port }}/login/generic_oauth"
-        client_name: "oc-client"
-        token_endpoint_auth_method: client_secret_basic
-        scope: openid email profile
-        grant_types:
-          - authorization_code
-        response_types:
-          - code
-      body_format: json
-      return_content: yes
-    register: iam_response
-
-  - name: Save client info
-    copy:
-      content: "{{ iam_response.json }}"
-      dest: "/usr/local/share/dodasts/monitoring/.client-iam.json"
-  when: not oidc_config.stat.exists|bool
-
+- name: Collect, Update and store locally the IAM Client info
+  ansible.builtin.include_tasks: iam-client.yml
+# ----------------------------------------------------------------------
 
 - name: Retrieve client info
   set_fact:
     iam_response: "{{ lookup('file', '/usr/local/share/dodasts/monitoring/.client-iam.json') }}"
-
 
 - name: Create grafana config
   template:
