@@ -15,11 +15,13 @@ Role Variables
 Variable for the monitoring service:
 
 - `monitoring_project_name`: string with the name of the current project (user's choice)
-- `monitoring_use_gpu`: bool, if the GPU is used and then monitored (default: false)
+- `monitoring_use_gpu`: bool, if the GPU is used and then monitored (default: false) ###
 - `monitoring_iam_url`: URL of the IAM service
-- `monitoring_iam_groups`: string with the name of the IAM groups allowed (space separated)
+- `monitoring_iam_groups`: string with the name of the IAM groups allowed (space separated) ###
 - `monitoring_iam_admin_groups`: string with the name of the IAM groups that will be admin (space separated)
-- `monitoring_server_ip`: string with the ip of the current server
+- `monitoring_server_ip`: string with the ip of the current server ###
+- `monitoring_iam_client_id`: string with the client id to use
+- `monitoring_iam_token`: string with the token
 
 Specific service variables:
 
