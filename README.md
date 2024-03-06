@@ -15,11 +15,10 @@ Role Variables
 Variable for the monitoring service:
 
 - `monitoring_project_name`: string with the name of the current project (user's choice)
-- `monitoring_use_gpu`: bool, if the GPU is used and then monitored (default: false)
 - `monitoring_iam_url`: URL of the IAM service
-- `monitoring_iam_groups`: string with the name of the IAM groups allowed (space separated)
 - `monitoring_iam_admin_groups`: string with the name of the IAM groups that will be admin (space separated)
-- `monitoring_server_ip`: string with the ip of the current server
+- `monitoring_iam_client_id`: string containing the client id 
+- `monitoring_iam_token`: string containing the iam client token
 
 Specific service variables:
 
@@ -55,7 +54,9 @@ Including an example of how to use your role (for instance, with variables passe
     - hosts: servers
       roles:
          - role: dodas-ts-monitoring
-           monitoring_project_name: compute_server
+           monitoring_iam_client_id: "XXXXX"
+           monitoring_iam_token: "XXXXX"
+           monitoring_iam_url: iam.cloud.infn.it
            service_grafana_admin_user: admin
            service_grafana_admin_password: example_password
 
