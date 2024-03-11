@@ -26,8 +26,6 @@ Specific service variables:
 - `service_grafana_port`: int, the grafana service port
 - `service_grafana_admin_user`: string
 - `service_grafana_admin_password`: string
-- `service_grafana_client_id`: string (used for the IAM login)
-- `service_grafana_client_secret`: string (used for the IAM login)
 - `service_grafana_image`: string (default: `"grafana/grafana:10.2.1"`)
 
 ### vars
